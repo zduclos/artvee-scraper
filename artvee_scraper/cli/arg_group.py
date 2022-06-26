@@ -93,10 +93,12 @@ class ArgGroup(ABC):
             "--worker-threads",
             dest="worker_threads",
             default=3,
-            choices=range(1, 17),
+            action=IsInRangeAction,
             metavar="[1-16]",
             help="Number of worker threads (1-16)",
             type=int,
+            minInclusive=1,
+            maxInclusive=16,
         )
         subparser.add_argument(
             "-l",
@@ -125,12 +127,58 @@ class ArgGroup(ABC):
             help="Image size",
         )
 
+        log_file_group = subparser.add_argument_group(
+            'optional log file arguments')
+        log_file_group.add_argument(
+            "--log-dir",
+            dest="log_dir",
+            action=IsDirAction,
+            help="Log file output directory",
+        )
+        log_file_group.add_argument(
+            "--log-max-size",
+            dest="log_max_size_mb",
+            default=1024,  # 1 GB
+            action=IsInRangeAction,  # 1MB to 10 GB
+            metavar="[1-10240]",
+            help="Maximum log file size in MB (1-10,240)",
+            type=int,
+            minInclusive=1,
+            maxInclusive=10240,
+        )
+        log_file_group.add_argument(
+            "--log-max-backups",
+            dest="log_max_backups",
+            default=10,
+            action=IsInRangeAction,
+            metavar="[0-100]",
+            help="Maximum number of log files to keep (0-100)",
+            type=int,
+            minInclusive=0,
+            maxInclusive=100,
+        )
+
+
+class IsInRangeAction(argparse.Action):
+    def __init__(self, minInclusive: int, maxInclusive: int, *args, **kwargs):
+        self.minInclusive = minInclusive
+        self.maxInclusive = maxInclusive
+        super(IsInRangeAction, self).__init__(*args, **kwargs)
+
+    def __call__(self, parser, namespace, value, option_string=None):
+        if not value in range(self.minInclusive, self.maxInclusive + 1):
+            parser.error(
+                f"argument {option_string}: invalid choice: {value} (must be in range [{self.minInclusive}-{self.maxInclusive}])")
+
+        setattr(namespace, self.dest, value)
+
 
 class IsDirAction(argparse.Action):
-    def __call__(self, parser, namespace, values, option_string=None):
-        path = Path(values)
+    def __call__(self, parser, namespace, value, option_string=None):
+        path = Path(value)
 
         if not path.is_dir():
-            parser.error(f"A directory in the path {values} does not exist")
+            parser.error(
+                f"argument {option_string}: invalid choice: A directory in the path {value} does not exist")
 
-        setattr(namespace, self.dest, values)
+        setattr(namespace, self.dest, value)

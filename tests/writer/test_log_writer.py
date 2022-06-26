@@ -4,12 +4,12 @@ import textwrap
 from artwork import Artwork
 from mockito import mock, verify, when
 
-from writer.console_writer import JsonConsoleWriter
+from writer.log_writer import JsonLogWriter
 
 
-def test_json_console_writer_write(caplog):
+def test_json_log_writer_write(caplog):
     # Setup
-    writer = JsonConsoleWriter()
+    writer = JsonLogWriter()
     artwork = Artwork(
         url="https://artvee.com/dl/composition-no-23/",
         title="Composition no. 23",
@@ -32,9 +32,9 @@ def test_json_console_writer_write(caplog):
     assert caplog.records[-1].levelname == "INFO"
 
 
-def test_json_console_writer_include_image(caplog):
+def test_json_log_writer_include_image(caplog):
     # Setup
-    writer = JsonConsoleWriter(include_image=True)
+    writer = JsonLogWriter(include_image=True)
     artwork = Artwork(
         url="https://artvee.com/dl/composition-no-23/",
         title="Composition no. 23",
@@ -58,9 +58,9 @@ def test_json_console_writer_include_image(caplog):
     assert caplog.records[-1].levelname == "INFO"
 
 
-def test_json_console_writer_sort_keys(caplog):
+def test_json_log_writer_sort_keys(caplog):
     # Setup
-    writer = JsonConsoleWriter(sort_keys=True)
+    writer = JsonLogWriter(sort_keys=True)
     artwork = Artwork(
         url="https://artvee.com/dl/composition-no-23/",
         title="Composition no. 23",
@@ -83,9 +83,9 @@ def test_json_console_writer_sort_keys(caplog):
     assert caplog.records[-1].levelname == "INFO"
 
 
-def test_json_console_writer_space_level(caplog):
+def test_json_log_writer_space_level(caplog):
     # Setup
-    writer = JsonConsoleWriter(space_level=2)
+    writer = JsonLogWriter(space_level=2)
     artwork = Artwork(
         url="https://artvee.com/dl/composition-no-23/",
         title="Composition no. 23",

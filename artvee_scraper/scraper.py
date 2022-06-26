@@ -13,7 +13,7 @@ from artvee_scraper.writer.file_writer import AbstractWriter
 
 from .artwork import Artwork
 
-logger = logging.getLogger(f"artvee-scraper.{__name__}")
+logger = logging.getLogger("artvee-scraper")
 
 
 class CategoryType(Enum):
@@ -54,7 +54,8 @@ class ArtveeScraper:
         image_size: ImageSize = ImageSize.MAX,
     ) -> None:
         self.writer = writer
-        self.workers = concurrent.futures.ThreadPoolExecutor(max_workers=worker_threads)
+        self.workers = concurrent.futures.ThreadPoolExecutor(
+            max_workers=worker_threads)
         self.categories = categories
         self.download_url_prefix = image_size.value
 
@@ -72,7 +73,8 @@ class ArtveeScraper:
 
             logger.info("Category %s has %d page(s)", category, page_count)
             for page in range(1, page_count + 1):
-                logger.info("Processing %s (%d/%d)", category, page, page_count)
+                logger.info("Processing %s (%d/%d)",
+                            category, page, page_count)
                 page_url = f"https://www.artvee.com/c/{category}/page/{page}/?per_page={ArtveeScraper._ITEMS_PER_PAGE}"
                 artwork_list = ArtveeScraper._scrape_artwork_data(page_url)
 
@@ -103,7 +105,8 @@ class ArtveeScraper:
                     img_link,
                     img_resp.status_code,
                 )
-            logger.error("Failed to extract image link from URL %s", artwork.url)
+            logger.error(
+                "Failed to extract image link from URL %s", artwork.url)
         except Exception:
             logging.error(
                 "An error occured while processing %s; %s",

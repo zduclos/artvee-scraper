@@ -4,7 +4,7 @@ import pytest
 
 from writer import writer_factory
 from writer.abstract_writer import AbstractWriter
-from writer.console_writer import JsonConsoleWriter
+from writer.log_writer import JsonLogWriter
 from writer.file_writer import JsonFileWriter, MultiFileWriter
 
 
@@ -30,9 +30,9 @@ from writer.file_writer import JsonFileWriter, MultiFileWriter
             MultiFileWriter,
         ),
         (
-            "console-json",
+            "log-json",
             Namespace(space_level=2, sort_keys=True, include_image=True),
-            JsonConsoleWriter,
+            JsonLogWriter,
         ),
     ],
 )

@@ -1,9 +1,12 @@
 import argparse
 import logging
+import os
 import sys
+from logging.handlers import RotatingFileHandler
 
-from artvee_scraper.cli.console_arg_group import JsonConsoleArgGroup
-from artvee_scraper.cli.file_arg_group import JsonFileArgGroup, MultiFileArgGroup
+from artvee_scraper.cli.log_arg_group import JsonLogArgGroup
+from artvee_scraper.cli.file_arg_group import (JsonFileArgGroup,
+                                               MultiFileArgGroup)
 from artvee_scraper.writer import writer_factory
 
 from .scraper import ArtveeScraper, CategoryType, ImageSize
@@ -16,7 +19,7 @@ def parse_cli_args() -> argparse.Namespace:
     subparsers = arg_parser.add_subparsers()
 
     # Register command options & parameters
-    JsonConsoleArgGroup(subparsers).register()
+    JsonLogArgGroup(subparsers).register()
     JsonFileArgGroup(subparsers).register()
     MultiFileArgGroup(subparsers).register()
 
@@ -29,10 +32,20 @@ def parse_cli_args() -> argparse.Namespace:
 
 
 def get_logger(args: argparse.Namespace) -> logging.Logger:
+    handlers = None
+    if log_dir := args.log_dir:
+        log_file = f"{log_dir}{os.path.sep}artvee_scraper.log"
+        log_max_bytes = args.log_max_size_mb * pow(1024, 2)
+
+        rotating_file_appender = RotatingFileHandler(
+            log_file, mode='a', maxBytes=log_max_bytes, backupCount=args.log_max_backups, encoding=None, delay=0)
+        handlers = [rotating_file_appender]
+
     logging.basicConfig(
         level=getattr(logging, args.log_level),
         format="%(asctime)s.%(msecs)03d %(levelname)s [%(threadName)s] %(module)s.%(funcName)s(%(lineno)d) | %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",
+        handlers=handlers,
     )
 
     return logging.getLogger("artvee-scraper")
@@ -47,7 +60,8 @@ def main():
 
     # Remove any duplicate categories if specified
     categories = (
-        list(dict.fromkeys(args.categories)) if args.categories else list(CategoryType)
+        list(dict.fromkeys(args.categories)
+             ) if args.categories else list(CategoryType)
     )
     scraper = ArtveeScraper(
         writer,
@@ -60,7 +74,8 @@ def main():
         with scraper as s:
             s.start()
     except KeyboardInterrupt:
-        raise SystemExit("Keyboard interrupt detected; shutting down immediately...")
+        raise SystemExit(
+            "Keyboard interrupt detected; shutting down immediately...")
 
 
 main()

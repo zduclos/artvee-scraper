@@ -9,7 +9,7 @@ from slugify import slugify
 from .abstract_writer import AbstractWriter
 from .command import Command, MacroCommand
 
-logger = logging.getLogger(f"artvee-scraper.{__name__}")
+logger = logging.getLogger("artvee-scraper")
 
 
 class JsonFileWriter(AbstractWriter):
@@ -71,7 +71,8 @@ class JsonFileWriter(AbstractWriter):
 
             return True
         except Exception as fee:
-            logger.error("Failed to write %s to the filesystem; %s", file_path, fee)
+            logger.error(
+                "Failed to write %s to the filesystem; %s", file_path, fee)
 
         return False
 
@@ -123,7 +124,8 @@ class MultiFileWriter(AbstractWriter):
         """
         macro_cmd = MacroCommand()
         macro_cmd.add(
-            WriteImageCommand(self._image_dir_path, artwork, self._overwrite_existing)
+            WriteImageCommand(self._image_dir_path, artwork,
+                              self._overwrite_existing)
         )
         macro_cmd.add(
             WriteMetadataCommand(
@@ -184,7 +186,8 @@ class WriteImageCommand(Command):
 
                 return True
             except Exception as e:
-                logger.error("Failed to write %s to the filesystem; %s", self._path, e)
+                logger.error(
+                    "Failed to write %s to the filesystem; %s", self._path, e)
 
         return False
 
@@ -200,7 +203,8 @@ class WriteImageCommand(Command):
             os.remove(self._path)
             return True
         except OSError as ose:
-            logger.error("Failed to delete %s from the filesystem; %s", self._path, ose)
+            logger.error(
+                "Failed to delete %s from the filesystem; %s", self._path, ose)
 
         return False
 
@@ -267,7 +271,8 @@ class WriteMetadataCommand(Command):
 
             return True
         except Exception as e:
-            logger.error("Failed to write %s to the filesystem; %s", self._path, e)
+            logger.error(
+                "Failed to write %s to the filesystem; %s", self._path, e)
 
         return False
 
@@ -283,6 +288,7 @@ class WriteMetadataCommand(Command):
             os.remove(self._path)
             return True
         except OSError as ose:
-            logger.error("Failed to delete %s from the filesystem; %s", self._path, ose)
+            logger.error(
+                "Failed to delete %s from the filesystem; %s", self._path, ose)
 
         return False

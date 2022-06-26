@@ -6,11 +6,11 @@ from artvee_scraper.artwork import Artwork
 
 from .abstract_writer import AbstractWriter
 
-logger = logging.getLogger(f"artvee-scraper.{__name__}")
+logger = logging.getLogger("artvee-scraper")
 
 
-class JsonConsoleWriter(AbstractWriter):
-    """Class for writing an artwork to the console as a JSON object.
+class JsonLogWriter(AbstractWriter):
+    """Class for writing an artwork to the log as a JSON object.
 
     Attributes:
         space_level (int, optional):
@@ -29,14 +29,14 @@ class JsonConsoleWriter(AbstractWriter):
         self._include_image = include_image
 
     def write(self, artwork: Artwork) -> bool:
-        """Writes the artwork to the console as a JSON object.
+        """Writes the artwork to the log as a JSON object.
 
         Args:
             artwork:
-                Artistic work to be written to the console.
+                Artistic work to be written to the log.
 
         Returns:
-            `True` if the artwork was written to the console successfully; otherwise `False`.
+            `True` if the artwork was written to the log successfully; otherwise `False`.
         """
         if not self._include_image:
             artwork.image = None

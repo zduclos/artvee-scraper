@@ -2,7 +2,7 @@ import argparse
 
 from artvee_scraper.writer.writer_factory import WriterType
 
-from .arg_group import ArgGroup, IsDirAction
+from .arg_group import ArgGroup, IsDirAction, IsInRangeAction
 
 
 class JsonFileArgGroup(ArgGroup):
@@ -25,10 +25,12 @@ class JsonFileArgGroup(ArgGroup):
             "--space-level",
             dest="space_level",
             default=0,
-            choices=range(2, 7),
+            action=IsInRangeAction,
             metavar="[2-6]",
             help="Enable pretty-printing; number of spaces to indent (2-6)",
             type=int,
+            minInclusive=2,
+            maxInclusive=6,
         )
         subparser.add_argument(
             "--sort-keys",
@@ -71,10 +73,12 @@ class MultiFileArgGroup(ArgGroup):
             "--space-level",
             dest="space_level",
             default=0,
-            choices=range(2, 7),
+            action=IsInRangeAction,
             metavar="[2-6]",
             help="Enable pretty-printing; number of spaces to indent (2-6)",
             type=int,
+            minInclusive=2,
+            maxInclusive=6,
         )
         subparser.add_argument(
             "--sort-keys",

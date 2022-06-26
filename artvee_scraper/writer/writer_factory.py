@@ -5,7 +5,7 @@ from enum import Enum
 from typing import Callable, Optional
 
 from .abstract_writer import AbstractWriter
-from .console_writer import JsonConsoleWriter
+from .log_writer import JsonLogWriter
 from .file_writer import JsonFileWriter, MultiFileWriter
 
 
@@ -62,10 +62,10 @@ class WriterType(Enum):
             overwrite_existing=args.overwrite_existing,
         ),
     )
-    JSON_CONSOLE = (
-        "console-json",
-        "Artwork is output to the console as a JSON object",
-        lambda args: JsonConsoleWriter(
+    JSON_LOG = (
+        "log-json",
+        "Artwork is output to the log as a JSON object",
+        lambda args: JsonLogWriter(
             space_level=args.space_level,
             sort_keys=args.sort_keys,
             include_image=args.include_image,
