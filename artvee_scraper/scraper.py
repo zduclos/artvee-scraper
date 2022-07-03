@@ -76,7 +76,8 @@ class ArtveeScraper:
                 logger.info("Processing %s (%d/%d)",
                             category, page, page_count)
                 page_url = f"https://www.artvee.com/c/{category}/page/{page}/?per_page={ArtveeScraper._ITEMS_PER_PAGE}"
-                artwork_list = ArtveeScraper._scrape_artwork_data(page_url)
+                artwork_list = ArtveeScraper._scrape_artwork_data(
+                    page_url, category.value.capitalize())
 
                 results = self.workers.map(self._worker_task, artwork_list)
 
@@ -179,7 +180,7 @@ class ArtveeScraper:
         return 0
 
     @staticmethod
-    def _scrape_artwork_data(page_url: str) -> List[Artwork]:
+    def _scrape_artwork_data(page_url: str, category: str) -> List[Artwork]:
         scraped_artwork = []
 
         try:
@@ -195,7 +196,7 @@ class ArtveeScraper:
                 )
 
                 for meta in all_metadata_html:
-                    if artwork := ArtveeScraper._parse_metadata_html(meta):
+                    if artwork := ArtveeScraper._parse_metadata_html(meta, category):
                         scraped_artwork.append(artwork)
 
             else:
@@ -214,15 +215,11 @@ class ArtveeScraper:
         return scraped_artwork
 
     @staticmethod
-    def _parse_metadata_html(metadata_html: Tag) -> Optional[Artwork]:
+    def _parse_metadata_html(metadata_html: Tag, category: str) -> Optional[Artwork]:
         try:
             img_details = metadata_html.find("h3", {"class": "product-title"})
-
             url = img_details.a.get("href")
             title = img_details.get_text(strip=True)
-            category = metadata_html.find(
-                "div", {"class": "woodmart-product-cats"}
-            ).get_text(strip=True)
 
             artwork = Artwork(url, title, category)
 
