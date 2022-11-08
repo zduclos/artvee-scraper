@@ -117,15 +117,6 @@ class ArgGroup(ABC):
             choices=list(CategoryType),
             help="Category of artwork to scrape",
         )
-        subparser.add_argument(
-            "-s",
-            "--image-size",
-            dest="image_size",
-            default="MAX",
-            type=str,
-            choices=["MAX", "STANDARD"],
-            help="Image size",
-        )
 
         log_file_group = subparser.add_argument_group(
             'optional log file arguments')

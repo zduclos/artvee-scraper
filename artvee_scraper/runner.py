@@ -67,7 +67,6 @@ def main():
         writer,
         worker_threads=args.worker_threads,
         categories=sorted(categories),
-        image_size=ImageSize[args.image_size],
     )
 
     try:

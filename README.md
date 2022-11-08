@@ -44,7 +44,7 @@ View help for the *file-json* command
 $ artvee-scraper file-json -h
 usage: artvee-scraper file-json [-h] [-t [1-16]] [-l {DEBUG,INFO,WARNING,ERROR,CRITICAL}]
                     [-c {abstract,figurative,landscape,religion,mythology,posters,animals,illustration,still-life,botanical,drawings,asian-art}]
-                    [-s {MAX,STANDARD}] [--log-dir LOG_DIR] [--log-max-size [1-10240]] [--log-max-backups [0-100]]
+                    [--log-dir LOG_DIR] [--log-max-size [1-10240]] [--log-max-backups [0-100]]
                     [--space-level [2-6]] [--sort-keys] [--overwrite-existing]
                     dir_path
 
@@ -59,8 +59,6 @@ optional arguments:
                         Set the application log level
   -c {abstract,figurative,landscape,religion,mythology,posters,animals,illustration,still-life,botanical,drawings,asian-art}, --category {abstract,figurative,landscape,religion,mythology,posters,animals,illustration,still-life,botanical,drawings,asian-art}
                         Category of artwork to scrape
-  -s {MAX,STANDARD}, --image-size {MAX,STANDARD}
-                        Image size
   --space-level [2-6]   Enable pretty-printing; number of spaces to indent (2-6)
   --sort-keys           Sort JSON keys in alphabetical order
   --overwrite-existing  Overwrite existing files
@@ -103,9 +101,6 @@ $ artvee-scraper log-json [optional arguments]
 >`-c` | `--category` (string)
 >> Category of artwork to fetch. One of: **abstract, figurative, landscape, religion, mythology, posters, animals, illustration, still-life,  botanical, drawings, asian-art**. May be repeatedly used to specify multiple categories (*-c animals, -c drawings*). The default value is *ALL*   categories.
 
-> `-s` | `--image-size` (string)
->> Image size. One of: **MAX, STANDARD**. Using *STANDARD* will use less data. The default value is *MAX*.
-
 ###### Optional log file arguments
 > `--log-dir` (string)
 >> Path to existing directory used to store *artvee_scraper.log* log files. Disabled by default.
@@ -136,13 +131,13 @@ $ artvee-scraper log-json
 ...
 2038-01-19 03:14:07.988 DEBUG [ThreadPoolExecutor-0_0] scraper._image_link_from(120) | Retrieving image download link from URL https://artvee.com/dl/study-for-old-canal-red-green/
 2038-01-19 03:14:07.989 DEBUG [ThreadPoolExecutor-0_0] connectionpool._new_conn(1001) | Starting new HTTPS connection (1): artvee.com:443
-2038-01-19 03:14:07.999 INFO [ThreadPoolExecutor-0_0] console_writer.write(44) | {"url": "https://artvee.com/dl/study-for-old-canal-red-green/", "title": "Study for Old Canal (Red & Green)", "category": "Abstract", "artist": "Oscar Bluemner", "date": "1916", "origin": "American, 1867-1938"}
+2038-01-19 03:14:07.999 INFO [ThreadPoolExecutor-0_0] log_writer.write(44) | {"url": "https://artvee.com/dl/study-for-old-canal-red-green/", "title": "Study for Old Canal (Red & Green)", "category": "Abstract", "artist": "Oscar Bluemner", "date": "1916", "origin": "American, 1867-1938"}
 ...
 ```
 
 ###### Advanced Example
 ```console
-$ artvee-scraper log-json --worker-threads 2 --log-level DEBUG --category abstract --image-size STANDARD --log-dir /var/log/artvee --log-max-size 2048 --log-max-backups 10 --space-level 2 --sort-keys --include-image
+$ artvee-scraper log-json --worker-threads 2 --log-level DEBUG --category abstract --log-dir /var/log/artvee --log-max-size 2048 --log-max-backups 10 --space-level 2 --sort-keys --include-image
 ```
 ###### Output:
 ```console
@@ -150,7 +145,7 @@ $ cat /var/log/artvee/artvee_scraper.log
 ...
 2038-01-19 03:14:07.988 DEBUG [ThreadPoolExecutor-0_0] scraper._image_link_from(120) | Retrieving image download link from URL https://artvee.com/dl/study-for-old-canal-red-green/
 2038-01-19 03:14:07.989 DEBUG [ThreadPoolExecutor-0_0] connectionpool._new_conn(1001) | Starting new HTTPS connection (1): artvee.com:443
-2038-01-19 03:14:07.999 INFO [ThreadPoolExecutor-0_0] console_writer.write(44) | {
+2038-01-19 03:14:07.999 INFO [ThreadPoolExecutor-0_0] log_writer.write(44) | {
   "artist": "Oscar Bluemner",
   "category": "Abstract",
   "date": "1916",
@@ -185,9 +180,6 @@ $ artvee-scraper file-json [optional arguments] <dir_path>
 >`-c` | `--category` (string)
 >> Category of artwork to fetch. One of: **abstract, figurative, landscape, religion, mythology, posters, animals, illustration, still-life,  botanical, drawings, asian-art**. May be repeatedly used to specify multiple categories (*-c animals, -c drawings*). The default value is *ALL*   categories.
 
-> `-s` | `--image-size` (string)
->> Image size. One of: **MAX, STANDARD**. Using *STANDARD* will use less data. The default value is *MAX*.
-
 ###### Optional log file arguments
 > `--log-dir` (string)
 >> Path to existing directory used to store *artvee_scraper.log* log files. Disabled by default.
@@ -220,7 +212,7 @@ $ cat ~/artvee/downloads/peter-nicolai-arbo-the-valkyrie.json
 
 ###### Advanced Example
 ```console
-$ artvee-scraper file-json --worker-threads 1 --log-level INFO --category mythology --image-size STANDARD --log-dir /var/log/artvee --log-max-size 512 --log-max-backups 10 --space-level 4 --sort-keys --overwrite-existing ~/artvee/downloads
+$ artvee-scraper file-json --worker-threads 1 --log-level INFO --category mythology --log-dir /var/log/artvee --log-max-size 512 --log-max-backups 10 --space-level 4 --sort-keys --overwrite-existing ~/artvee/downloads
 ```
 ###### Output:
 ```console
@@ -262,9 +254,6 @@ $ artvee-scraper file-multi [optional arguments] <metadata_dir_path> <image_dir_
 > `-c` | `--category` (string)
 >> Category of artwork to fetch. One of: **abstract, figurative, landscape, religion, mythology, posters, animals, illustration, still-life,  botanical, drawings, asian-art**. May be repeatedly used to specify multiple categories (*-c animals -c drawings*). The default value is *ALL*   categories.
 
-> `-s` | `--image-size` (string)
->> Image size. One of: **MAX, STANDARD**. Using *STANDARD* will use less data. The default value is *MAX*.
-
 ###### Optional log file arguments
 > `--log-dir` (string)
 >> Path to existing directory used to store *artvee_scraper.log* log files. Disabled by default.
@@ -302,7 +291,7 @@ $ cat ~/artvee/downloads/images/peter-nicolai-arbo-the-valkyrie.jpg
 
 ###### Advanced Example
 ```console
-$ artvee-scraper file-multi --worker-threads 1 --log-level INFO --category mythology --image-size STANDARD --log-dir /var/log/artvee --log-max-size 512 --log-max-backups 10 --space-level 2 --sort-keys --overwrite-existing ~/artvee/downloads/metadata ~/artvee/downloads/images
+$ artvee-scraper file-multi --worker-threads 1 --log-level INFO --category mythology --log-dir /var/log/artvee --log-max-size 512 --log-max-backups 10 --space-level 2 --sort-keys --overwrite-existing ~/artvee/downloads/metadata ~/artvee/downloads/images
 ```
 ###### Output:
 ```console

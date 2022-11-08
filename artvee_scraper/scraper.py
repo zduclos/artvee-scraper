@@ -51,13 +51,13 @@ class ArtveeScraper:
         writer: AbstractWriter,
         worker_threads: int = 3,
         categories: List[CategoryType] = list(CategoryType),
-        image_size: ImageSize = ImageSize.MAX,
+        image_size: ImageSize = ImageSize.STANDARD,
     ) -> None:
         self.writer = writer
         self.workers = concurrent.futures.ThreadPoolExecutor(
             max_workers=worker_threads)
         self.categories = categories
-        self.download_url_prefix = image_size.value
+        self.image_size = image_size
 
     def __enter__(self):
         return self
@@ -133,14 +133,17 @@ class ArtveeScraper:
             # Select the correct max/standard image size link
             for link in img_links:
                 link_dest = link.get("href")
-                if link_dest.startswith(self.download_url_prefix):
+                if link_dest.startswith(self.image_size.value):
                     return link_dest
 
-        logger.error(
-            "Failed to retrieve image download link from URL %s; Status Code: %d",
-            artwork_url,
-            download_page_resp.status_code,
-        )
+            logger.error("Download link for %s image size is not available",
+                         self.image_size.name)
+        else:
+            logger.error(
+                "Failed to retrieve image download link from URL %s; Status Code: %d",
+                artwork_url,
+                download_page_resp.status_code,
+            )
 
         return None
 
