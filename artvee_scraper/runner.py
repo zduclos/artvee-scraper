@@ -58,15 +58,17 @@ def main():
     logger.debug(f"Parsed command line arguments: {vars(args)}")
     writer = writer_factory.get_instance(args.command, args)
 
+    artists = args.artists.split(",")
     # Remove any duplicate categories if specified
     categories = (
         list(dict.fromkeys(args.categories)
-             ) if args.categories else list(CategoryType)
+             ) if args.categories else []
     )
     scraper = ArtveeScraper(
         writer,
         worker_threads=args.worker_threads,
         categories=sorted(categories),
+        artists=artists
     )
 
     try:

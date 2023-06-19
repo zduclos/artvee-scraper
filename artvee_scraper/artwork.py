@@ -12,7 +12,7 @@ class Artwork:
             Image download URL
         title (str):
             Name of the artwork
-        category (str):
+        category (str, optional):
             Category the work of art is depicting (ex: abstract, still-life, animals, etc)
         artist (str, optional):
             Name of the person that created this artwork. Defaults to `Unknown Artist`
@@ -26,8 +26,8 @@ class Artwork:
 
     url: str
     title: str
-    category: str
-    artist: str = "Unknown Artist"
+    category: Optional[str] = ""
+    artist: Optional[str] = "Unknown Artist"
     date: str = "n.d."
     origin: Optional[str] = None
     image: Optional[bytes] = None

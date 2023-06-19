@@ -117,6 +117,14 @@ class ArgGroup(ABC):
             choices=list(CategoryType),
             help="Category of artwork to scrape",
         )
+        subparser.add_argument(
+            "-a",
+            "--artists",
+            dest="artists",
+            default="",
+            type=str,
+            help="Category of artwork to scrape",
+        )
 
         log_file_group = subparser.add_argument_group(
             'optional log file arguments')
