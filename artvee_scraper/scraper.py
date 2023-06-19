@@ -50,13 +50,15 @@ class ArtveeScraper:
         self,
         writer: AbstractWriter,
         worker_threads: int = 3,
-        categories: List[CategoryType] = list(CategoryType),
+        categories: List[CategoryType] = [],
+        artists: List[str] = [],
         image_size: ImageSize = ImageSize.STANDARD,
     ) -> None:
         self.writer = writer
         self.workers = concurrent.futures.ThreadPoolExecutor(
             max_workers=worker_threads)
         self.categories = categories
+        self.artists = artists
         self.image_size = image_size
 
     def __enter__(self):
@@ -69,7 +71,7 @@ class ArtveeScraper:
         logger.info("Starting scraper for categories %s", self.categories)
 
         for category in self.categories:
-            page_count = ArtveeScraper._num_pages_for_category(category)
+            page_count = ArtveeScraper._num_pages_for('c/' + category.value)
 
             logger.info("Category %s has %d page(s)", category, page_count)
             for page in range(1, page_count + 1):
@@ -77,7 +79,26 @@ class ArtveeScraper:
                             category, page, page_count)
                 page_url = f"https://www.artvee.com/c/{category}/page/{page}/?per_page={ArtveeScraper._ITEMS_PER_PAGE}"
                 artwork_list = ArtveeScraper._scrape_artwork_data(
-                    page_url, category.value.capitalize())
+                    page_url, category=category.value.capitalize())
+
+                results = self.workers.map(self._worker_task, artwork_list)
+
+                # Block until all submitted tasks for a page have completed
+                for r in results:
+                    pass
+
+        logger.info("Starting scraper for artists %s", self.artists)
+
+        for artist in self.artists:
+            page_count = ArtveeScraper._num_pages_for('artist/' + artist)
+
+            logger.info("Artist %s has %d page(s)", artist, page_count)
+            for page in range(1, page_count + 1):
+                logger.info("Processing %s (%d/%d)",
+                            artist, page, page_count)
+                page_url = f"https://www.artvee.com/artist/{artist}/page/{page}/?per_page={ArtveeScraper._ITEMS_PER_PAGE}"
+                artwork_list = ArtveeScraper._scrape_artwork_data(
+                    page_url, artist=artist)
 
                 results = self.workers.map(self._worker_task, artwork_list)
 
@@ -148,11 +169,11 @@ class ArtveeScraper:
         return None
 
     @staticmethod
-    def _num_pages_for_category(category: CategoryType) -> int:
+    def _num_pages_for(url: str) -> int:
         logger.debug(
-            "Calculating the number of pages required by category '%s'", category
+            "Calculating the number of pages available at '%s'", url
         )
-        url = f"https://artvee.com/c/{category}/page/1/?per_page={ArtveeScraper._ITEMS_PER_PAGE}"
+        url = f"https://artvee.com/{url}/page/1/?per_page={ArtveeScraper._ITEMS_PER_PAGE}"
 
         try:
             resp = requests.get(url)
@@ -183,7 +204,7 @@ class ArtveeScraper:
         return 0
 
     @staticmethod
-    def _scrape_artwork_data(page_url: str, category: str) -> List[Artwork]:
+    def _scrape_artwork_data(page_url: str, **kwargs) -> List[Artwork]:
         scraped_artwork = []
 
         try:
@@ -199,7 +220,7 @@ class ArtveeScraper:
                 )
 
                 for meta in all_metadata_html:
-                    if artwork := ArtveeScraper._parse_metadata_html(meta, category):
+                    if artwork := ArtveeScraper._parse_metadata_html(meta, **kwargs):
                         scraped_artwork.append(artwork)
 
             else:
@@ -218,13 +239,13 @@ class ArtveeScraper:
         return scraped_artwork
 
     @staticmethod
-    def _parse_metadata_html(metadata_html: Tag, category: str) -> Optional[Artwork]:
+    def _parse_metadata_html(metadata_html: Tag, **kwargs) -> Optional[Artwork]:
         try:
             img_details = metadata_html.find("h3", {"class": "product-title"})
             url = img_details.a.get("href")
             title = img_details.get_text(strip=True)
 
-            artwork = Artwork(url, title, category)
+            artwork = Artwork(url, title, **kwargs)
 
             if title_matcher := ArtveeScraper._PATTERN.match(title):
                 artwork.title = title_matcher.group(1).strip()
