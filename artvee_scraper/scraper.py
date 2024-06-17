@@ -46,23 +46,25 @@ class ArtveeScraper:
     _ITEMS_PER_PAGE = 70
     _PATTERN = re.compile("^(.+) *\\((.+)\\) *$")
 
+    _HTTP_CONN_TIMEOUT_SEC = 3.05
+    _HTTP_READ_TIMEOUT_SEC = 10
+
     def __init__(
         self,
         writer: AbstractWriter,
         worker_threads: int = 3,
-        categories: List[CategoryType] = list(CategoryType),
+        categories: List[CategoryType] = None,
         image_size: ImageSize = ImageSize.STANDARD,
     ) -> None:
         self.writer = writer
-        self.workers = concurrent.futures.ThreadPoolExecutor(
-            max_workers=worker_threads)
-        self.categories = categories
+        self.workers = concurrent.futures.ThreadPoolExecutor(max_workers=worker_threads)
+        self.categories = list(CategoryType) if categories is None else categories
         self.image_size = image_size
 
     def __enter__(self):
         return self
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, *_):
         self.shutdown(True)
 
     def start(self):
@@ -73,16 +75,16 @@ class ArtveeScraper:
 
             logger.info("Category %s has %d page(s)", category, page_count)
             for page in range(1, page_count + 1):
-                logger.info("Processing %s (%d/%d)",
-                            category, page, page_count)
+                logger.info("Processing %s (%d/%d)", category, page, page_count)
                 page_url = f"https://www.artvee.com/c/{category}/page/{page}/?per_page={ArtveeScraper._ITEMS_PER_PAGE}"
                 artwork_list = ArtveeScraper._scrape_artwork_data(
-                    page_url, category.value.capitalize())
+                    page_url, category.value.capitalize()
+                )
 
                 results = self.workers.map(self._worker_task, artwork_list)
 
                 # Block until all submitted tasks for a page have completed
-                for r in results:
+                for _ in results:
                     pass
 
     def shutdown(self, wait: bool) -> None:
@@ -94,7 +96,10 @@ class ArtveeScraper:
         try:
             if img_link := self._image_link_from(artwork.url):
                 # Download image
-                img_resp = requests.get(img_link)
+                img_resp = requests.get(
+                    img_link,
+                    timeout=(self._HTTP_CONN_TIMEOUT_SEC, self._HTTP_READ_TIMEOUT_SEC),
+                )
 
                 if img_resp.status_code == 200:
                     # Write the artwork to destination
@@ -106,8 +111,7 @@ class ArtveeScraper:
                     img_link,
                     img_resp.status_code,
                 )
-            logger.error(
-                "Failed to extract image link from URL %s", artwork.url)
+            logger.error("Failed to extract image link from URL %s", artwork.url)
         except Exception:
             logging.error(
                 "An error occured while processing %s; %s",
@@ -119,7 +123,10 @@ class ArtveeScraper:
 
     def _image_link_from(self, artwork_url: str) -> Optional[str]:
         logger.debug("Retrieving image download link from URL %s", artwork_url)
-        download_page_resp = requests.get(artwork_url)
+        download_page_resp = requests.get(
+            artwork_url,
+            timeout=(self._HTTP_CONN_TIMEOUT_SEC, self._HTTP_READ_TIMEOUT_SEC),
+        )
 
         if download_page_resp.status_code == 200:
             soup = BeautifulSoup(download_page_resp.content, "html.parser")
@@ -136,8 +143,9 @@ class ArtveeScraper:
                 if link_dest.startswith(self.image_size.value):
                     return link_dest
 
-            logger.error("Download link for %s image size is not available",
-                         self.image_size.name)
+            logger.error(
+                "Download link for %s image size is not available", self.image_size.name
+            )
         else:
             logger.error(
                 "Failed to retrieve image download link from URL %s; Status Code: %d",
@@ -155,7 +163,13 @@ class ArtveeScraper:
         url = f"https://artvee.com/c/{category}/page/1/?per_page={ArtveeScraper._ITEMS_PER_PAGE}"
 
         try:
-            resp = requests.get(url)
+            resp = requests.get(
+                url,
+                timeout=(
+                    ArtveeScraper._HTTP_CONN_TIMEOUT_SEC,
+                    ArtveeScraper._HTTP_READ_TIMEOUT_SEC,
+                ),
+            )
 
             if resp.status_code == 200:
                 soup = BeautifulSoup(resp.content, "html.parser")
@@ -188,7 +202,13 @@ class ArtveeScraper:
 
         try:
             logger.debug("Retrieving artwork metadata URL %s", page_url)
-            website_resp = requests.get(page_url)
+            website_resp = requests.get(
+                page_url,
+                timeout=(
+                    ArtveeScraper._HTTP_CONN_TIMEOUT_SEC,
+                    ArtveeScraper._HTTP_READ_TIMEOUT_SEC,
+                ),
+            )
 
             if website_resp.status_code == 200:
                 soup = BeautifulSoup(

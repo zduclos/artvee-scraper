@@ -5,11 +5,7 @@ from setuptools import find_packages, setup
 here = pathlib.Path(__file__).parent.resolve()
 long_description = (here / "README.md").read_text(encoding="utf-8")
 
-requires = [
-    "beautifulsoup4~=4.11.1",
-    "requests~=2.28.1",
-    "python-slugify~=6.1.2"
-]
+requires = ["beautifulsoup4~=4.12.3", "requests~=2.32.3", "python-slugify~=8.0.4"]
 
 setup(
     name="artvee-scraper",
