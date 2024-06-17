@@ -181,9 +181,7 @@ def test_json_file_writer_overwrite_existing():
 def test_multi_file_writer_write():
     # Mock open (image write)
     in_memory_image_file = InMemoryBytesFile()
-    when(builtins).open(ANY(str), "xb", encoding="UTF-8").thenReturn(
-        in_memory_image_file
-    )
+    when(builtins).open(ANY(str), "xb").thenReturn(in_memory_image_file)
 
     # Mock open (metadata write)
     in_memory_meta_file = InMemoryTextFile()
@@ -217,9 +215,7 @@ def test_multi_file_writer_write():
 def test_multi_file_write_metadata_rollback():
     # Mock open (image write)
     in_memory_image_file = BytesIO()  # no need to capture; automatically discards
-    when(builtins).open(ANY(str), "xb", encoding="UTF-8").thenReturn(
-        in_memory_image_file
-    )
+    when(builtins).open(ANY(str), "xb").thenReturn(in_memory_image_file)
 
     # Mock open (metadata write)
     when(builtins).open(ANY(str), "x", encoding="UTF-8").thenRaise(
@@ -247,7 +243,7 @@ def test_multi_file_write_metadata_rollback():
 
 def test_multi_file_write_image_rollback():
     # Mock open (image write)
-    when(builtins).open(ANY(str), "xb", encoding="UTF-8").thenRaise(
+    when(builtins).open(ANY(str), "xb").thenRaise(
         FileExistsError("file already exists!")
     )
 
@@ -273,9 +269,7 @@ def test_multi_file_write_image_rollback():
 def test_multi_file_writer_sort_keys():
     # Mock open (image write)
     in_memory_image_file = InMemoryBytesFile()
-    when(builtins).open(ANY(str), "xb", encoding="UTF-8").thenReturn(
-        in_memory_image_file
-    )
+    when(builtins).open(ANY(str), "xb").thenReturn(in_memory_image_file)
 
     # Mock open (metadata write)
     in_memory_meta_file = InMemoryTextFile()
@@ -309,9 +303,7 @@ def test_multi_file_writer_sort_keys():
 def test_multi_file_writer_space_level():
     # Mock open (image write)
     in_memory_image_file = InMemoryBytesFile()
-    when(builtins).open(ANY(str), "xb", encoding="UTF-8").thenReturn(
-        in_memory_image_file
-    )
+    when(builtins).open(ANY(str), "xb").thenReturn(in_memory_image_file)
 
     # Mock open (metadata write)
     in_memory_meta_file = InMemoryTextFile()
@@ -351,7 +343,7 @@ def test_multi_file_writer_space_level():
 
 def test_multi_file_writer_overwrite_existing():
     # Mock open (image write)
-    when(builtins).open(ANY(str), "wb", encoding="UTF-8").thenReturn(BytesIO())
+    when(builtins).open(ANY(str), "wb").thenReturn(BytesIO())
 
     # Mock open (metadata write)
     when(builtins).open(ANY(str), "w", encoding="UTF-8").thenReturn(StringIO())
