@@ -179,7 +179,7 @@ class WriteImageCommand(Command):
             logger.debug("Writing %s to the filesystem", self._path)
 
             try:
-                with open(self._path, self._open_option) as fout:
+                with open(self._path, self._open_option, encoding="UTF-8") as fout:
                     fout.write(self._image)
                     logger.debug("Wrote %s to the filesystem", self._path)
 
