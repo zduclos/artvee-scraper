@@ -49,7 +49,7 @@ class InMemoryBytesFile(BytesIO):
 def test_json_file_writer_write():
     # Mock open
     in_memory_file = InMemoryTextFile()
-    when(builtins).open(ANY(str), "x").thenReturn(in_memory_file)
+    when(builtins).open(ANY(str), "x", encoding="UTF-8").thenReturn(in_memory_file)
 
     # Setup
     writer = JsonFileWriter("/tmp")
@@ -75,7 +75,7 @@ def test_json_file_writer_write():
 
 def test_json_file_writer_write_exception():
     # Mock open
-    when(builtins).open(ANY(str), "x").thenRaise(
+    when(builtins).open(ANY(str), "x", encoding="UTF-8").thenRaise(
         FileExistsError("file already exists!")
     )
 
@@ -98,7 +98,7 @@ def test_json_file_writer_write_exception():
 def test_json_file_writer_sort_keys():
     # Mock open
     in_memory_file = InMemoryTextFile()
-    when(builtins).open(ANY(str), "x").thenReturn(in_memory_file)
+    when(builtins).open(ANY(str), "x", encoding="UTF-8").thenReturn(in_memory_file)
 
     # Setup
     writer = JsonFileWriter("/tmp", sort_keys=True)
@@ -125,7 +125,7 @@ def test_json_file_writer_sort_keys():
 def test_json_file_writer_space_level():
     # Mock open
     in_memory_file = InMemoryTextFile()
-    when(builtins).open(ANY(str), "x").thenReturn(in_memory_file)
+    when(builtins).open(ANY(str), "x", encoding="UTF-8").thenReturn(in_memory_file)
 
     # Setup
     writer = JsonFileWriter("/tmp", space_level=2)
@@ -159,7 +159,7 @@ def test_json_file_writer_space_level():
 
 def test_json_file_writer_overwrite_existing():
     # Mock open
-    when(builtins).open(ANY(str), "w").thenReturn(StringIO())
+    when(builtins).open(ANY(str), "w", encoding="UTF-8").thenReturn(StringIO())
 
     # Setup
     writer = JsonFileWriter("/tmp", overwrite_existing=True)
@@ -185,7 +185,7 @@ def test_multi_file_writer_write():
 
     # Mock open (metadata write)
     in_memory_meta_file = InMemoryTextFile()
-    when(builtins).open(ANY(str), "x").thenReturn(in_memory_meta_file)
+    when(builtins).open(ANY(str), "x", encoding="UTF-8").thenReturn(in_memory_meta_file)
 
     # Setup
     writer = MultiFileWriter("/tmp/metadata", "/tmp/images")
@@ -218,7 +218,7 @@ def test_multi_file_write_metadata_rollback():
     when(builtins).open(ANY(str), "xb").thenReturn(in_memory_image_file)
 
     # Mock open (metadata write)
-    when(builtins).open(ANY(str), "x").thenRaise(
+    when(builtins).open(ANY(str), "x", encoding="UTF-8").thenRaise(
         FileExistsError("file already exists!")
     )
 
@@ -273,7 +273,7 @@ def test_multi_file_writer_sort_keys():
 
     # Mock open (metadata write)
     in_memory_meta_file = InMemoryTextFile()
-    when(builtins).open(ANY(str), "x").thenReturn(in_memory_meta_file)
+    when(builtins).open(ANY(str), "x", encoding="UTF-8").thenReturn(in_memory_meta_file)
 
     # Setup
     writer = MultiFileWriter("/tmp/metadata", "/tmp/images", sort_keys=True)
@@ -307,7 +307,7 @@ def test_multi_file_writer_space_level():
 
     # Mock open (metadata write)
     in_memory_meta_file = InMemoryTextFile()
-    when(builtins).open(ANY(str), "x").thenReturn(in_memory_meta_file)
+    when(builtins).open(ANY(str), "x", encoding="UTF-8").thenReturn(in_memory_meta_file)
 
     # Setup
     writer = MultiFileWriter("/tmp/metadata", "/tmp/images", space_level=2)
@@ -346,7 +346,7 @@ def test_multi_file_writer_overwrite_existing():
     when(builtins).open(ANY(str), "wb").thenReturn(BytesIO())
 
     # Mock open (metadata write)
-    when(builtins).open(ANY(str), "w").thenReturn(StringIO())
+    when(builtins).open(ANY(str), "w", encoding="UTF-8").thenReturn(StringIO())
 
     # Setup
     writer = MultiFileWriter("/tmp/metadata", "/tmp/images", overwrite_existing=True)

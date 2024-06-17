@@ -52,6 +52,6 @@ class Artwork:
         Returns:
             This object as a dict.
         """
-        d = self.__dict__
-        d["image"] = self.get_image_encoded()
-        return d
+        artwork_dict = self.__dict__
+        artwork_dict["image"] = self.get_image_encoded()
+        return artwork_dict

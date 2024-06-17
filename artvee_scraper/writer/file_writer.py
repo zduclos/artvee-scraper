@@ -3,8 +3,9 @@ import logging
 import os
 from typing import Optional
 
-from artvee_scraper.artwork import Artwork
 from slugify import slugify
+
+from artvee_scraper.artwork import Artwork
 
 from .abstract_writer import AbstractWriter
 from .command import Command, MacroCommand
@@ -59,7 +60,7 @@ class JsonFileWriter(AbstractWriter):
             logger.debug("Writing %s to the filesystem", file_path)
 
             # Write file
-            with open(file_path, self._open_option) as fout:
+            with open(file_path, self._open_option, encoding="UTF-8") as fout:
                 json.dump(
                     artwork.to_dict(),
                     fout,
@@ -71,8 +72,7 @@ class JsonFileWriter(AbstractWriter):
 
             return True
         except Exception as fee:
-            logger.error(
-                "Failed to write %s to the filesystem; %s", file_path, fee)
+            logger.error("Failed to write %s to the filesystem; %s", file_path, fee)
 
         return False
 
@@ -124,8 +124,7 @@ class MultiFileWriter(AbstractWriter):
         """
         macro_cmd = MacroCommand()
         macro_cmd.add(
-            WriteImageCommand(self._image_dir_path, artwork,
-                              self._overwrite_existing)
+            WriteImageCommand(self._image_dir_path, artwork, self._overwrite_existing)
         )
         macro_cmd.add(
             WriteMetadataCommand(
@@ -185,9 +184,10 @@ class WriteImageCommand(Command):
                     logger.debug("Wrote %s to the filesystem", self._path)
 
                 return True
-            except Exception as e:
+            except Exception as exc:
                 logger.error(
-                    "Failed to write %s to the filesystem; %s", self._path, e)
+                    "Failed to write %s to the filesystem; %s", self._path, exc
+                )
 
         return False
 
@@ -203,8 +203,7 @@ class WriteImageCommand(Command):
             os.remove(self._path)
             return True
         except OSError as ose:
-            logger.error(
-                "Failed to delete %s from the filesystem; %s", self._path, ose)
+            logger.error("Failed to delete %s from the filesystem; %s", self._path, ose)
 
         return False
 
@@ -256,7 +255,7 @@ class WriteMetadataCommand(Command):
         logger.debug("Writing %s to the filesystem", self._path)
 
         try:
-            with open(self._path, self._open_option) as fout:
+            with open(self._path, self._open_option, encoding="UTF-8") as fout:
                 artwork_dict = vars(self._artwork)
                 artwork_dict.pop("image")
 
@@ -270,9 +269,8 @@ class WriteMetadataCommand(Command):
                 logger.debug("Wrote %s to the filesystem", self._path)
 
             return True
-        except Exception as e:
-            logger.error(
-                "Failed to write %s to the filesystem; %s", self._path, e)
+        except Exception as exc:
+            logger.error("Failed to write %s to the filesystem; %s", self._path, exc)
 
         return False
 
@@ -288,7 +286,6 @@ class WriteMetadataCommand(Command):
             os.remove(self._path)
             return True
         except OSError as ose:
-            logger.error(
-                "Failed to delete %s from the filesystem; %s", self._path, ose)
+            logger.error("Failed to delete %s from the filesystem; %s", self._path, ose)
 
         return False
