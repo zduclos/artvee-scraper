@@ -8,6 +8,7 @@
   - [Installation](#installation)
   - [Getting Started](#getting-started)
   - [Examples](#examples)
+  - [API Reference](#api-reference)
 
 ## Overview
 Artvee-scraper is a web scraper which concurrently extracts artwork from Artvee. Callbacks are notified asynchronously for each scraped
@@ -126,3 +127,6 @@ me@linux-desktop:~$ python app.py
 2038-01-19 19:36:37.955 DEBUG [Thread-1 (_exec)] artvee_client.get_metadata(152) | Retrieving metadata; category=abstract, page=1
     ...
 ```
+
+## API Reference
+API documentation is available on [Read the Docs](https://artvee-scraper.readthedocs.io/).
